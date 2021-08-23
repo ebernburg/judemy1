@@ -12,10 +12,16 @@ export const mutationTypes = {
     registerStart:   '[auth] registerStart',
     registerSuccess: '[auth] registerSuccess',
     registerFailure: '[auth] registerFailure',
+
+  loginStart:   '[auth] loginStart',
+  loginSuccess: '[auth] loginSuccess',
+  loginFailure: '[auth] loginFailure',
+
 }
 
 export const actionTypes = {
   register:   '[auth] register',
+  login:   '[auth] login',
 }
 
 const mutations = {
@@ -29,6 +35,20 @@ const mutations = {
     state.validationErrors = null;
   },
   [mutationTypes.registerFailure](state, payload) {
+    state.isSubmitting = false;
+    state.validationErrors = payload;
+  },
+
+  [mutationTypes.loginStart](state) {
+    state.isSubmitting = true;
+  },
+  [mutationTypes.loginSuccess](state, payload) {
+    state.isSubmitting = false;
+    state.currentUser = payload;
+    state.isLoggedIn = true;
+    state.validationErrors = null;
+  },
+  [mutationTypes.loginFailure](state, payload) {
     state.isSubmitting = false;
     state.validationErrors = payload;
   },
@@ -51,6 +71,29 @@ const actions = {
         .catch((result) => {
           console.log('error', result);
           context.commit(mutationTypes.registerFailure, result.response.data.errors);
+        });
+    });
+  },
+
+  [actionTypes.login](context, credentials) {
+    return new Promise((resolve) => {
+      context.commit(mutationTypes.loginStart);
+      authApi
+        .login(credentials)
+        .then((response) => {
+          console.log('response', response);
+          context.commit(mutationTypes.loginSuccess, response.data.user);
+          // window.localStorage.setItem('accessToken', response.data.user.token);
+          setItem('accessToken', response.data.user.token);
+
+          resolve(response.data.user);
+        })
+        .catch((result) => {
+          console.log('error', result);
+          context.commit(
+            mutationTypes.loginFailure,
+            result.response.data.errors
+          );
         });
     });
   },
