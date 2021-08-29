@@ -4,25 +4,42 @@ import {setItem} from '@/helpers/persistanceStorage';
 const state = {
   isSubmitting: false,
   currentUser: null,
+  isLoading: false,
   validationErrors: null,
   isLoggedIn: null,
 };
 
 export const mutationTypes = {
-    registerStart:   '[auth] registerStart',
-    registerSuccess: '[auth] registerSuccess',
-    registerFailure: '[auth] registerFailure',
+  registerStart: '[auth] registerStart',
+  registerSuccess: '[auth] registerSuccess',
+  registerFailure: '[auth] registerFailure',
 
-  loginStart:   '[auth] loginStart',
+  loginStart: '[auth] loginStart',
   loginSuccess: '[auth] loginSuccess',
   loginFailure: '[auth] loginFailure',
 
-}
+  getCurrentUserStart: '[auth] getCurrentUserStart',
+  getCurrentUserSuccess: '[auth] getCurrentUserSuccess',
+  getCurrentUserFailure: '[auth] getCurrentUserFailure',
+};
 
 export const actionTypes = {
-  register:   '[auth] register',
-  login:   '[auth] login',
-}
+  register: '[auth] register',
+  login: '[auth] login',
+  getCurrentUser: '[auth] getCurrentUser',
+};
+
+const getters = {
+  currentUser: (state) => {
+    return state.currentUser;
+  },
+  isLoggedIn: (state) => {
+    return Boolean(state.isLoggedIn);
+  },
+  isAnonymous: (state) => {
+    return state.isLoggedIn === false;
+  },
+};
 
 const mutations = {
   [mutationTypes.registerStart](state) {
@@ -52,6 +69,20 @@ const mutations = {
     state.isSubmitting = false;
     state.validationErrors = payload;
   },
+
+  [mutationTypes.getCurrentUserStart](state) {
+    state.isLoading = true;
+  },
+  [mutationTypes.getCurrentUserSuccess](state, payload) {
+    state.currentUser = payload;
+    state.isLoggedIn = true;
+    state.isLoading = false;
+  },
+  [mutationTypes.getCurrentUserFailure](state) {
+    state.isLoading = false;
+    state.isLoggedIn = false;
+    state.currentUser = null;
+  },
 };
 
 const actions = {
@@ -63,14 +94,17 @@ const actions = {
         .then((response) => {
           console.log('response', response);
           context.commit(mutationTypes.registerSuccess, response.data.user);
-         // window.localStorage.setItem('accessToken', response.data.user.token);
+          // window.localStorage.setItem('accessToken', response.data.user.token);
           setItem('accessToken', response.data.user.token);
 
           resolve(response.data.user);
         })
         .catch((result) => {
           console.log('error', result);
-          context.commit(mutationTypes.registerFailure, result.response.data.errors);
+          context.commit(
+            mutationTypes.registerFailure,
+            result.response.data.errors
+          );
         });
     });
   },
@@ -97,10 +131,34 @@ const actions = {
         });
     });
   },
+
+  [actionTypes.getCurrentUser](context) {
+    return new Promise((resolve) => {
+      context.commit(mutationTypes.getCurrentUserStart);
+      authApi
+        .getCurrentUser()
+        .then((response) => {
+          context.commit(
+            mutationTypes.getCurrentUserSuccess,
+            response.data.user
+          );
+          // window.localStorage.setItem('accessToken', response.data.user.token);
+          //setItem('accessToken', response.data.user.token);
+
+          resolve(response.data.user);
+        })
+        .catch(() => {
+          context.commit(
+            mutationTypes.getCurrentUserFailure,
+          );
+        });
+    });
+  },
 };
 
 export default {
   state,
   mutations,
   actions,
+  getters,
 };

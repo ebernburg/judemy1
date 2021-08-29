@@ -103,7 +103,7 @@ export default {
         .then((user) => {
           console.log('successfully register user', user);
           //alert('successfully register user')
-          this.$router.push({name: 'About'});
+          this.$router.push({name: 'globalFeed'});
           //window.location.href = 'https://www.google.com'
         });
     },
