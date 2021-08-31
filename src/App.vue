@@ -1,8 +1,6 @@
 <template>
 
-  <Topbar
-
-  />
+  <Topbar />
 
   <router-view />
 </template>

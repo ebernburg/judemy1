@@ -9,11 +9,11 @@ const routes = [
     name: 'globalFeed',
     component: GlobalFeed,
   },
-  {
-    path: '/globalFeed',
-    name: 'globalFeed',
-    component: GlobalFeed,
-  },
+  // {
+  //   path: '/globalFeed',
+  //   name: 'globalFeed',
+  //   component: GlobalFeed,
+  // },
   {
     path: '/feed',
     name: 'yourFeed',
@@ -32,7 +32,7 @@ const routes = [
   {
     path: '/tags/:slug',
     name: 'tag',
-    component: Login,
+    component: GlobalFeed,
   },
   {
     path: '/article/new',
@@ -65,20 +65,6 @@ const routes = [
     //component: UserProfile,
   },
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   {
     path: '/about/:id',
     name: 'About',
@@ -89,8 +75,6 @@ const routes = [
       import(/* webpackChunkName: "about" */ '../views/About.vue'),
   },
 ];
-
-
 
 const router = createRouter({
   history: createWebHashHistory(),

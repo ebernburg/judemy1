@@ -6,7 +6,7 @@ import {getItem} from '@/helpers/persistanceStorage';
 axios.defaults.headers.get['header-name'] = 'value';
 
 axios.defaults.baseURL = 'https://conduit.productionready.io/api';
-//axios.defaults.baseURL = 'http://localhost:8000/api';
+//axios.defaults.baseURL = 'http://laravel-realworld-example-app/api';
 //axios.defaults.baseURL = 'http://laravel-realworld-example-app/api';
 
 axios.interceptors.request.use((config) => {
